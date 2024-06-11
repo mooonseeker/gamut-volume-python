@@ -41,7 +41,7 @@ def readCGATS(filename):
         cgats[f] = [row[i] for row in data]
 
     # Store headers
-    hdrs = list(range(1, bdf)) + list(range(edf + 1, bd))
+    hdrs = list(range(0, bdf)) + list(range(edf + 1, bd))
     cgats["headers"] = [lines[i] for i in hdrs if i not in nos]
 
     return cgats
@@ -51,7 +51,7 @@ def writeCGATS(cgats, filename):
     with open(filename, "w") as f:
         # Write out the headers
         for header in cgats["headers"]:
-            f.write(f"{header}\n")
+            f.write(f"{header}")
 
         # Write out the data format
         f.write("BEGIN_DATA_FORMAT\n")
