@@ -1,8 +1,9 @@
 import numpy as np
+import colour
 import cgats
 
 
-def make_gamut_envelope(input_file, output_file):
+def make_gamut_envelope(input_file, output_file, model=None):
     color_data = cgats.readCGATS(input_file)
 
     # Build the XYZ and RGB arrays
@@ -16,16 +17,23 @@ def make_gamut_envelope(input_file, output_file):
     Lmax = XYZn[1]
     XYZ = XYZ / Lmax
     XYZn = XYZn / Lmax
-    # Get a D50 white point of equivalent luminance
-    D50_White = np.array([0.9642, 1, 0.8249])
 
-    # Chromatically adapt CIE XYZ to D50 using CIECAM02 CAT
-    # XYZ_adapted = colour.adaptation.chromatic_adaptation(XYZ, XYZn, D50_White)
-    XYZ_adapted = chromatic_adaptation(XYZ, XYZn, D50_White)
+    if model == "CAM16-UCS":
+        # Calculate CAM16-UCS Jab
+        CIELAB = colour.XYZ_to_CAM16UCS(XYZ)
+    else:
+        # Get a D50 white point of equivalent luminance
+        D50_White = np.array([0.9642, 1, 0.8249])
+        # D65_White = np.array([0.9504, 1, 1.0888])
 
-    # Calculate CIELAB
-    # CIELAB = colour.XYZ_to_Lab(XYZ_adapted,colour.CCS_ILLUMINANTS["CIE 1931 2 Degree Standard Observer"]["D50"])
-    CIELAB = XYZ_to_Lab(XYZ_adapted, D50_White)
+        # Chromatically adapt CIE XYZ to D50 using CIECAM02 CAT
+        # XYZ_adapted = colour.adaptation.chromatic_adaptation(XYZ, XYZn, D50_White)
+        XYZ_adapted = chromatic_adaptation(XYZ, XYZn, D50_White)
+
+        # Calculate CIELAB
+        # CIELAB = colour.XYZ_to_Lab(XYZ_adapted,colour.CCS_ILLUMINANTS["CIE 1931 2 Degree Standard Observer"]["D50"])
+        CIELAB = XYZ_to_Lab(XYZ_adapted, D50_White)
+
     # Assign the LAB values to the appropriate property
     color_data["LAB_L"] = CIELAB[:, 0]
     color_data["LAB_A"] = CIELAB[:, 1]

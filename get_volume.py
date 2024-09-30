@@ -1,6 +1,5 @@
 import numpy as np
 import cgats
-import make_tesselation
 
 
 def map_rows(ref, targ):
@@ -20,7 +19,7 @@ def map_rows(ref, targ):
 def get_d_C(cgats, Lsteps, hsteps):
     # Get the standard tesselation
     RGB = np.array([cgats["RGB_R"], cgats["RGB_G"], cgats["RGB_B"]]).T
-    TRI_ref, RGB_ref = make_tesselation.make_tesselation(np.unique(RGB))
+    TRI_ref, RGB_ref = make_tesselation(np.unique(RGB))
     # Make a LUT which maps rows in RGB_ref to rows in RGB
     mapping = map_rows(RGB_ref, RGB)
     # Get the standard tesselation referencing rows of RGB instead of RGB_ref
@@ -98,7 +97,7 @@ def get_d_C(cgats, Lsteps, hsteps):
             if np.sum(ix) == 0:
                 ix = (u >= -0.001) & (v >= -0.001) & (u + v <= 1.001) & (t >= 0)
             # calculate and store the d and C* values for each intersection (if any)
-            d[iL][iHue] = np.sign(idet[ix])
+            d[iL][iHue] = -np.sign(idet[ix])
             C[iL][iHue] = t[ix]
             volmap[iL][iHue] = np.sum(-np.sign(idet[ix]) * t[ix] ** 2)
 
@@ -119,3 +118,44 @@ def get_volume(filename):
     # sum the values and correct the scaling
     V = np.sum(volmap) * 100 * np.pi / (L_steps * h_steps)
     return V
+
+
+def make_tesselation(gsv):
+    N = len(gsv)
+
+    # Build the reference RGB table
+    J, K = np.meshgrid(gsv, gsv)
+    J = J.flatten()
+    K = K.flatten()
+    Lower = np.zeros_like(J) + gsv[0]
+    Upper = np.zeros_like(J) + gsv[-1]
+
+    # on the bottom surface the order must be rotations of Lower,J,K
+    # on the top surface the order must be rotations of Upper,K,J
+    RGB_ref = np.vstack(
+        [
+            np.column_stack((Lower, J, K)),
+            np.column_stack((K, Lower, J)),
+            np.column_stack((J, K, Lower)),
+            np.column_stack((Upper, K, J)),
+            np.column_stack((J, Upper, K)),
+            np.column_stack((K, J, Upper)),
+        ]
+    )
+
+    # Build the required tessellation
+    TRI_ref = np.zeros((12 * (N - 1) ** 2, 3), dtype=int)
+    idx = 0
+    for s in range(6):
+        for q in range(N - 1):
+            for p in range(N - 1):
+                m = N**2 * s + N * q + p
+                # The two triangles must have the same rotation
+                # consider A B  triangle 1 = A-B-C
+                #         C D  triangle 2 = B-D-C
+                # both are clockwise
+                TRI_ref[idx] = [m, m + N, m + 1]
+                TRI_ref[idx + 1] = [m + N, m + N + 1, m + 1]
+                idx += 2
+
+    return TRI_ref, RGB_ref

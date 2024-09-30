@@ -20,11 +20,11 @@ def plot_rings(file, ref_file=None):
     x_closed = np.hstack((x_selected, x_selected[:, [0]])).T
     y_selected = y[9::10, :]
     y_closed = np.hstack((y_selected, y_selected[:, [0]])).T
-    plt.plot(x_closed, y_closed, "k")
+    plt.plot(x_closed, y_closed, "b")
 
     # Add labels for L* 10, 50 and 100
-    for n in [10, 50, 100]:
-        plt.text(x[n - 1, -1], y[n - 1, -1], f"L*={n}", color=[0.5, 0.3, 0])
+    # for n in [10, 50, 100]:
+    #     plt.text(x[n - 1, -1], y[n - 1, -1], f"L*={n}", color=[0.5, 0.3, 0])
 
     # Add a central marker
     plt.plot(0, 0, "+", markersize=20)
@@ -33,24 +33,31 @@ def plot_rings(file, ref_file=None):
     if ref_file is not None:
         ref_cgats = cgats.readCGATS(ref_file)
         _, _, volmap_ref = get_volume.get_d_C(ref_cgats, Lsteps, hsteps)
-        x, y, _, _ = calc_rings(volmap_ref)
-        x = np.hstack((x[-1, :], x[-1, 0]))
-        y = np.hstack((y[-1, :], y[-1, 0]))
-        plt.plot(x.T, y.T, "--k")
+        x, y, _, vol_ref = calc_rings(volmap_ref)
+
+        x_selected = x[99::10, :]
+        x_closed = np.hstack((x_selected, x_selected[:, [0]])).T
+        y_selected = y[99::10, :]
+        y_closed = np.hstack((y_selected, y_selected[:, [0]])).T
+        plt.plot(x_closed, y_closed, "k--")
+        title = f"CAM16-UCS Gamut Rings\nSample = {vol:.0f} vs DCI-P3 = {vol_ref:.0f}"
+        plt.title(title)
+    else:
+        # Add the title
+        title = f"CIELAB gamut rings\nVolume = {vol:.0f}"
+        plt.title(title)
 
     # Add a little padding to the axis range
     plt.axis(np.array(plt.axis()) * 1.05)
 
-    # Make the axes equal
-    plt.axis("equal")
-
-    # Add the title
-    title = "CIELab gamut rings\nVolume = {}".format(vol)
-    plt.title(title)
+    # Make the axis equal
+    # plt.axis("equal")
+    # plt.axis([-1100, 1100, -825, 825])
+    plt.axis([-400, 400, -300, 300])
 
     # Add the axis labels
-    plt.xlabel("a*_{RSS}")
-    plt.ylabel("b*_{RSS}")
+    plt.xlabel(r"$a^{*}_{RSS}$")
+    plt.ylabel(r"$b^{*}_{RSS}$")
 
     plt.show()
 
@@ -63,7 +70,7 @@ def calc_rings(volmap):
 
     # Get the map of the volume in cylindrical coordinates
     volmap = volmap * dL * dH / 2
-    # Get the accumulated volume sum (the final cols will be the total)
+    # Get the accumulated volume sum (the final row will be the total)
     # and calculate the radius required to represent that volume
     rings = (2 * np.cumsum(volmap, axis=0) / dH) ** 0.5
 
