@@ -1,5 +1,5 @@
 # gamut-volume-python
-CIELab gamut volume calculation and visualisation in Python  
+Gamut volume calculation and visualisation in Python  
 This project is based on Matlab code from IDMS V1.1 Section 5.32, which can be obtained at DOI: [10.55410/bjxb8678](https://www.sid.org/Standards/ICDM-DOI#gamut_volume_1.1r02)  
 ## Pre-requisites
 - Python  

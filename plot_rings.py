@@ -1,8 +1,8 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import cgats
 import get_volume
+import intersection_volume
 
 
 def plot_rings(file, ref_file=None):
@@ -16,6 +16,7 @@ def plot_rings(file, ref_file=None):
     x, y, _, vol = calc_rings(volmap)
 
     # Plot the figure
+    plt.figure(figsize=(6.4, 6.4))
     x_selected = x[9::10, :]
     x_closed = np.hstack((x_selected, x_selected[:, [0]])).T
     y_selected = y[9::10, :]
@@ -34,26 +35,27 @@ def plot_rings(file, ref_file=None):
         ref_cgats = cgats.readCGATS(ref_file)
         _, _, volmap_ref = get_volume.get_d_C(ref_cgats, Lsteps, hsteps)
         x, y, _, vol_ref = calc_rings(volmap_ref)
+        _, cover = intersection_volume.coverage(file, ref_file)
+        gv = 100.0 * vol / vol_ref
+        gvc = 100.0 * cover
 
         x_selected = x[99::10, :]
         x_closed = np.hstack((x_selected, x_selected[:, [0]])).T
         y_selected = y[99::10, :]
         y_closed = np.hstack((y_selected, y_selected[:, [0]])).T
         plt.plot(x_closed, y_closed, "k--")
-        title = f"CAM16-UCS Gamut Rings\nSample = {vol:.0f} vs DCI-P3 = {vol_ref:.0f}"
+        title = f"CAM16-UCS Gamut Rings\nGamut Volume = {gv:.2f}%\nGamut Volume Coverage= {gvc:.2f}%"
         plt.title(title)
     else:
         # Add the title
-        title = f"CIELAB gamut rings\nVolume = {vol:.0f}"
+        title = f"CAM16-UCS gamut rings\nGamut Volume = {vol:.0f}"
         plt.title(title)
 
     # Add a little padding to the axis range
     plt.axis(np.array(plt.axis()) * 1.05)
 
     # Make the axis equal
-    # plt.axis("equal")
-    # plt.axis([-1100, 1100, -825, 825])
-    plt.axis([-400, 400, -300, 300])
+    plt.axis("equal")
 
     # Add the axis labels
     plt.xlabel(r"$a^{*}_{RSS}$")
