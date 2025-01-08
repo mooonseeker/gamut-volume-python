@@ -1,9 +1,26 @@
+"""
+Convert RGB/XYZ data to RGB/3D color space coordinate data.
+
+This module provides:
+- Generation of 3D color space coordinate data.
+- Supported model: 
+    - CIELAB-D50: RGB/LAB
+    - CAM16-UCS: RGB/Jab
+- (independent) Bradford chromatic adaptation
+- (independent) XYZ to L*a*b*
+
+Note: If higher accuracy is required, it is still recommended to use the chromatic adaptation fucntion from colour-science.
+
+"""
+
 import numpy as np
 import colour
 import cgats
 
 
 def make_gamut_envelope(input_file, output_file, model=None):
+    """Convert RGB/XYZ data to RGB/3D color space coordinate data."""
+
     color_data = cgats.readCGATS(input_file)
 
     # Build the XYZ and RGB arrays
@@ -59,6 +76,8 @@ def make_gamut_envelope(input_file, output_file, model=None):
 
 
 def chromatic_adaptation(XYZ, XYZn, White):
+    """Bradford chromatic adaptation."""
+
     # Bradford chromatic adaptation transform matrix
     M = np.array(
         [
@@ -83,6 +102,8 @@ def chromatic_adaptation(XYZ, XYZn, White):
 
 
 def XYZ_to_Lab(XYZ, XYZn):
+    """Converr XYZ to L*a*b*."""
+
     ratio = XYZ / XYZn
 
     # Calculate f(X/Xn),f(Y/Yn),f(Y/Yn)

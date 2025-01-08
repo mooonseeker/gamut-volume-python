@@ -1,3 +1,5 @@
+"""Convert the gamut volume into a 2D gamut ring graph."""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cgats
@@ -6,6 +8,8 @@ import intersection_volume
 
 
 def plot_rings(file, ref_file=None):
+    """Draw a gamut rings graph."""
+
     # Read the CGATS files
     color_data = cgats.readCGATS(file)
 
@@ -65,6 +69,8 @@ def plot_rings(file, ref_file=None):
 
 
 def calc_rings(volmap):
+    """Calculate the volume map for each dL and dH."""
+
     Lsteps = volmap.shape[0]
     hsteps = volmap.shape[1]
     dH = 2 * np.pi / hsteps

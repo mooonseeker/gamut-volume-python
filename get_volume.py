@@ -1,3 +1,7 @@
+"""
+Take the RGB/3D color space coordinate data as input and return the gamut volume in delta E3.
+"""
+
 import numpy as np
 import cgats
 
@@ -17,6 +21,8 @@ def map_rows(ref, targ):
 
 
 def get_d_C(cgats, Lsteps, hsteps):
+    """Subprocess of gamut volume calculation."""
+
     # Get the standard tesselation
     RGB = np.array([cgats["RGB_R"], cgats["RGB_G"], cgats["RGB_B"]]).T
     TRI_ref, RGB_ref = make_tesselation(np.unique(RGB))
@@ -105,6 +111,8 @@ def get_d_C(cgats, Lsteps, hsteps):
 
 
 def get_volume(filename):
+    """Calculate the gamut volume."""
+
     # read the CGATS file
     input_data = cgats.readCGATS(filename)
 
@@ -121,6 +129,8 @@ def get_volume(filename):
 
 
 def make_tesselation(gsv):
+    """Generate a tessellation of a 3D grid surface for gamut volume calculation."""
+
     N = len(gsv)
 
     # Build the reference RGB table

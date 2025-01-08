@@ -1,9 +1,13 @@
+"""Calculate the intersection and coverage of gamut volume."""
+
 import numpy as np
 import cgats
 import get_volume
 
 
 def coverage(file, ref_file):
+    """Calculate the intersection and coverage of gamut volume."""
+
     color_data = cgats.readCGATS(file)
     color_ref = cgats.readCGATS(ref_file)
 
