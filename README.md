@@ -26,6 +26,7 @@ Convert RGB/XYZ data to RGB/3D color space coordinate data.
 - Supported model:  
   - CIELAB-D50: RGB/LAB  
   - CAM16-UCS: RGB/Jab  
+  - ICtCp: RGB/ICtCp  
 
 ### get_volume
 
