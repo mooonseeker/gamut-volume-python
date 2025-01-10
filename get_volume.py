@@ -23,6 +23,11 @@ def map_rows(ref, targ):
 def get_d_C(cgats, Lsteps, hsteps):
     """Subprocess of gamut volume calculation."""
 
+    # Check the data format
+    fmt = cgats["fmt"]
+    if fmt[1] != "RGB_R" or fmt[4] == "XYZ_X":
+        raise ValueError("Invaild CGATS data file.")
+
     # Get the standard tesselation
     RGB = np.array([cgats["RGB_R"], cgats["RGB_G"], cgats["RGB_B"]]).T
     TRI_ref, RGB_ref = make_tesselation(np.unique(RGB))
@@ -30,8 +35,8 @@ def get_d_C(cgats, Lsteps, hsteps):
     mapping = map_rows(RGB_ref, RGB)
     # Get the standard tesselation referencing rows of RGB instead of RGB_ref
     TRI = mapping[TRI_ref]
-    # Get the CIELAB data in Z
-    LAB = np.array([cgats["LAB_A"], cgats["LAB_B"], cgats["LAB_L"]]).T
+    # Get the 3D color space coordinate data, note that the order is a*/b*/L*
+    LAB = np.array([cgats[fmt[5]], cgats[fmt[6]], cgats[fmt[4]]]).T
 
     # Find the minmum and maxmum L* in each triangle
     # Get a matrix of all L values of all TRI vertices
