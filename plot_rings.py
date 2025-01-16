@@ -18,6 +18,7 @@ def plot_rings(file, ref_file=None):
     hsteps = 360
     _, _, volmap = get_volume.get_d_C(color_data, Lsteps, hsteps)
     x, y, _, vol = calc_rings(volmap)
+    output = []
 
     # Plot the figure
     plt.figure(figsize=(6.4, 6.4))
@@ -50,10 +51,12 @@ def plot_rings(file, ref_file=None):
         plt.plot(x_closed, y_closed, "k--")
         title = f"CAM16-UCS Gamut Rings\nGamut Volume = {gv:.2f}%\nGamut Volume Coverage= {gvc:.2f}%"
         plt.title(title)
+        output = [gv, gvc]
     else:
         # Add the title
         title = f"CAM16-UCS gamut rings\nGamut Volume = {vol:.0f}"
         plt.title(title)
+        output = [vol]
 
     # Add a little padding to the axis range
     plt.axis(np.array(plt.axis()) * 1.05)
@@ -66,6 +69,7 @@ def plot_rings(file, ref_file=None):
     plt.ylabel(r"$b^{*}_{RSS}$")
 
     plt.show()
+    return output
 
 
 def calc_rings(volmap):
