@@ -11,7 +11,6 @@ This module provides:
 - (independent) XYZ to L*a*b*
 
 Note: If higher accuracy is required, it is still recommended to use the chromatic adaptation fucntion from colour-science.
-
 """
 
 import numpy as np
@@ -19,7 +18,9 @@ import colour
 import cgats
 
 
-def make_gamut_envelope(input_file: str, output_file: str = None, model: str = None):
+def make_gamut_envelope(
+    input_file: str, output_file: str = None, model: str = None
+) -> dict:
     """Convert RGB/XYZ data to RGB/3D color space coordinate data."""
 
     # Read the color data from the cgats file
@@ -93,10 +94,12 @@ def make_gamut_envelope(input_file: str, output_file: str = None, model: str = N
     if output_file is None:
         output_file = input_file[:-7] + model + ".txt"
     cgats.writeCGATS(output_data, output_file)
-    return CIELAB
+    return output_data
 
 
-def chromatic_adaptation(XYZ, XYZn, White):
+def chromatic_adaptation(
+    XYZ: np.ndarray, XYZn: np.ndarray, White: np.ndarray
+) -> np.ndarray:
     """Bradford chromatic adaptation."""
 
     # Bradford chromatic adaptation transform matrix
@@ -122,7 +125,7 @@ def chromatic_adaptation(XYZ, XYZn, White):
     return output
 
 
-def XYZ_to_Lab(XYZ, XYZn):
+def XYZ_to_Lab(XYZ: np.ndarray, XYZn: np.ndarray) -> np.ndarray:
     """Converr XYZ to L*a*b*."""
 
     ratio = XYZ / XYZn

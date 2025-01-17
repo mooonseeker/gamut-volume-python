@@ -3,10 +3,54 @@ Take the RGB/3D color space coordinate data as input and return the gamut volume
 """
 
 import numpy as np
+from typing import Tuple
 import cgats
 
 
-def map_rows(ref, targ):
+def make_tesselation(gsv: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Generate a tessellation of a 3D grid surface for gamut volume calculation."""
+
+    N = len(gsv)
+
+    # Build the reference RGB table
+    J, K = np.meshgrid(gsv, gsv)
+    J = J.flatten()
+    K = K.flatten()
+    Lower = np.zeros_like(J) + gsv[0]
+    Upper = np.zeros_like(J) + gsv[-1]
+
+    # on the bottom surface the order must be rotations of Lower,J,K
+    # on the top surface the order must be rotations of Upper,K,J
+    RGB_ref = np.vstack(
+        [
+            np.column_stack((Lower, J, K)),
+            np.column_stack((K, Lower, J)),
+            np.column_stack((J, K, Lower)),
+            np.column_stack((Upper, K, J)),
+            np.column_stack((J, Upper, K)),
+            np.column_stack((K, J, Upper)),
+        ]
+    )
+
+    # Build the required tessellation
+    TRI_ref = np.zeros((12 * (N - 1) ** 2, 3), dtype=int)
+    idx = 0
+    for s in range(6):
+        for q in range(N - 1):
+            for p in range(N - 1):
+                m = N**2 * s + N * q + p
+                # The two triangles must have the same rotation
+                # consider A B  triangle 1 = A-B-C
+                #         C D  triangle 2 = B-D-C
+                # both are clockwise
+                TRI_ref[idx] = [m, m + N, m + 1]
+                TRI_ref[idx + 1] = [m + N, m + N + 1, m + 1]
+                idx += 2
+
+    return TRI_ref, RGB_ref
+
+
+def map_rows(ref: np.ndarray, targ: np.ndarray) -> np.ndarray:
     """Map the rows of a reference matrix to a target matrix."""
 
     mapping = np.zeros((ref.shape[0],), dtype=int)
@@ -20,7 +64,7 @@ def map_rows(ref, targ):
     return mapping
 
 
-def get_d_C(cgats, Lsteps, hsteps):
+def get_d_C(cgats: dict, Lsteps: int, hsteps: int) -> Tuple[list, list, np.ndarray]:
     """Subprocess of gamut volume calculation."""
 
     # Check the data format
@@ -115,7 +159,7 @@ def get_d_C(cgats, Lsteps, hsteps):
     return d, C, volmap
 
 
-def get_volume(filename):
+def get_volume(filename: str) -> float:
     """Calculate the gamut volume."""
 
     # read the CGATS file
@@ -133,44 +177,22 @@ def get_volume(filename):
     return V
 
 
-def make_tesselation(gsv):
-    """Generate a tessellation of a 3D grid surface for gamut volume calculation."""
+def coverage(file: str, ref_file: str) -> Tuple[float, float]:
+    """Calculate the intersection and coverage of gamut volume."""
 
-    N = len(gsv)
+    color_data = cgats.readCGATS(file)
+    color_ref = cgats.readCGATS(ref_file)
 
-    # Build the reference RGB table
-    J, K = np.meshgrid(gsv, gsv)
-    J = J.flatten()
-    K = K.flatten()
-    Lower = np.zeros_like(J) + gsv[0]
-    Upper = np.zeros_like(J) + gsv[-1]
+    _, _, volmap = get_d_C(color_data, 100, 360)
+    _, _, volmap_ref = get_d_C(color_ref, 100, 360)
+    volmap_coverage = np.minimum(volmap, volmap_ref)
 
-    # on the bottom surface the order must be rotations of Lower,J,K
-    # on the top surface the order must be rotations of Upper,K,J
-    RGB_ref = np.vstack(
-        [
-            np.column_stack((Lower, J, K)),
-            np.column_stack((K, Lower, J)),
-            np.column_stack((J, K, Lower)),
-            np.column_stack((Upper, K, J)),
-            np.column_stack((J, Upper, K)),
-            np.column_stack((K, J, Upper)),
-        ]
-    )
+    dH = 2 * np.pi / 360
+    volmap_coverage = volmap_coverage * dH / 2
+    volmap_ref = volmap_ref * dH / 2
 
-    # Build the required tessellation
-    TRI_ref = np.zeros((12 * (N - 1) ** 2, 3), dtype=int)
-    idx = 0
-    for s in range(6):
-        for q in range(N - 1):
-            for p in range(N - 1):
-                m = N**2 * s + N * q + p
-                # The two triangles must have the same rotation
-                # consider A B  triangle 1 = A-B-C
-                #         C D  triangle 2 = B-D-C
-                # both are clockwise
-                TRI_ref[idx] = [m, m + N, m + 1]
-                TRI_ref[idx + 1] = [m + N, m + N + 1, m + 1]
-                idx += 2
+    vol_coverage = np.sum(volmap_coverage)
+    vol_ref = np.sum(volmap_ref)
+    coverage_ratio = vol_coverage / vol_ref
 
-    return TRI_ref, RGB_ref
+    return vol_coverage, coverage_ratio

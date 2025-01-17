@@ -3,13 +3,12 @@ Read from and write to a CGATS data file.
 
 This module provides functions for reading and writing data
 in the CGATS (Committee for Graphic Arts Technologies Standards) format.
-
 """
 
 import numpy as np
 
 
-def readCGATS(filename):
+def readCGATS(filename: str) -> dict:
     """Read a CGATS data file and return a CGATS dict."""
 
     # Read all lines of the file to a list
@@ -57,7 +56,7 @@ def readCGATS(filename):
     return cgats
 
 
-def writeCGATS(cgats, filename):
+def writeCGATS(cgats: dict, filename: str) -> None:
     """Take a CGATS dict and write a CGATS data file."""
 
     with open(filename, "w") as f:

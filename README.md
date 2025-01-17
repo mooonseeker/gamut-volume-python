@@ -32,12 +32,9 @@ Convert RGB/XYZ data to RGB/3D color space coordinate data.
 
 Take the RGB/3D color space coordinate data as input and return the gamut volume in delta E3.  
 The [Moller-Trumbore ray-triangle intersection algorithm](https://doi.org/10.1080/10867651.1997.10487472) is used.  
+If a reference is provided, calculate the gamut volume coverage.  
 
 ### plot_rings
 
 Convert the gamut volume into a 2D gamut ring graph.  
 If a reference is provided, both the gamut volume and gamut volume coverage will be shown in the graph title.  
-
-### intersection_volume
-
-Calculate the intersection and coverage of gamut volume.  
