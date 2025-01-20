@@ -1,3 +1,7 @@
+# Byte-compiled
 __pycache__/
+# Environments
+.venv
+# Data
 data/
 test.*

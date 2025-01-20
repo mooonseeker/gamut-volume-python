@@ -1,4 +1,4 @@
-"""Convert the gamut volume into a 2D gamut ring graph."""
+"""Take the RGB/3D color space coordinate data as input and visualize the gamut volume."""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -93,3 +93,36 @@ def calc_rings(volmap: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, 
     y = np.cos(midH).reshape(1, hsteps) * rings
     vol = np.sum(volmap)
     return x, y, rings, vol
+
+
+def plot_scatter(file: str, ref_file: str = None) -> None:
+    """Draw a 3D color gamut volume graph."""
+
+    # Create a 3D plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
+
+    # Read Sample Data
+    color_data = cgats.readCGATS(file)
+    fmt = color_data["fmt"]
+    LAB = np.array([color_data[fmt[4]], color_data[fmt[5]], color_data[fmt[6]]]).T
+    ax.scatter(LAB[:, 2], LAB[:, 1], LAB[:, 0], "red")
+
+    # Read Reference Data
+    if ref_file is not None:
+        color_data_ref = cgats.readCGATS(ref_file)
+        LAB_ref = np.array(
+            [color_data_ref[fmt[4]], color_data_ref[fmt[5]], color_data_ref[fmt[6]]]
+        ).T
+        ax.scatter(LAB_ref[:, 2], LAB_ref[:, 1], LAB_ref[:, 0], "blue")
+
+    # Set the axis labels
+    ax.set_xlabel(r"$a^{*}$")
+    ax.set_ylabel(r"$b^{*}$")
+    ax.set_zlabel(r"$L^{*}$")
+
+    # Set the axis limits
+    ax.set_xlim(ax.get_xlim()[::-1])
+    ax.view_init(elev=30, azim=30)
+    plt.show()
+    return None

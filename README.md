@@ -8,7 +8,6 @@ which can be obtained at DOI: [10.55410/bjxb8678](https://www.sid.org/Standards/
 ## Pre-requisites
 
 - Python  
-- Jupyter  
 - numpy  
 - matplotlib  
 - colour-science  
@@ -34,7 +33,9 @@ Take the RGB/3D color space coordinate data as input and return the gamut volume
 The [Moller-Trumbore ray-triangle intersection algorithm](https://doi.org/10.1080/10867651.1997.10487472) is used.  
 If a reference is provided, calculate the gamut volume coverage.  
 
-### plot_rings
+### visualisation
 
-Convert the gamut volume into a 2D gamut ring graph.  
-If a reference is provided, both the gamut volume and gamut volume coverage will be shown in the graph title.  
+Take the RGB/3D color space coordinate data as input and visualize the gamut volume.  
+
+- 3D gamut volume scatter graph  
+- 2D gamut ring graph  
