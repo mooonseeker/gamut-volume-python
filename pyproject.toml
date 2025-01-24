@@ -1,0 +1,24 @@
+[project]
+name = "gamut-volume-python"
+version = "1.0.0"
+description = "Gamut volume calculation and visualisation in Python"
+authors = [
+    {name = "mooonseeker",email = "zhushengtao1996@outlook.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "numpy (>=2.2.2,<3.0.0)",
+    "colour-science (>=0.4.6,<0.5.0)",
+    "matplotlib (>=3.10.0,<4.0.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
