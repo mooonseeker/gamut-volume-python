@@ -4,6 +4,7 @@ Take the RGB/3D color space coordinate data as input and return the gamut volume
 
 import numpy as np
 from typing import Tuple
+
 import cgats
 
 
@@ -19,8 +20,8 @@ def make_tesselation(gsv: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     Lower = np.zeros_like(J) + gsv[0]
     Upper = np.zeros_like(J) + gsv[-1]
 
-    # on the bottom surface the order must be rotations of Lower,J,K
-    # on the top surface the order must be rotations of Upper,K,J
+    # On the bottom surface the order must be rotations of Lower,J,K
+    # On the top surface the order must be rotations of Upper,K,J
     RGB_ref = np.vstack(
         [
             np.column_stack((Lower, J, K)),
@@ -121,22 +122,22 @@ def get_d_C(cgats: dict, Lsteps: int, hsteps: int) -> Tuple[list, list, np.ndarr
         edge2 = vert2 - vert0
         # and the vector to the origin of each tile
         o = orig - vert0
-        # pre-calculate the cross products outside the inner loop
+        # Pre-calculate the cross products outside the inner loop
         e2e1 = np.cross(edge2, edge1)
         e2o = np.cross(edge2, o)
         oe1 = np.cross(o, edge1)
         # and the one determinant which does not involve 'dir'
         e2oe1 = np.sum(edge2 * oe1, axis=1, keepdims=True)  # keepdims is important!
-        # drop the L* coordinate as the 'dir' vector always has dL*=0
+        # Drop the L* coordinate as the 'dir' vector always has dL*=0
         e2e1 = e2e1[:, :-1]
         e2o = e2o[:, :-1]
         oe1 = oe1[:, :-1]
 
-        # for every step in Hue
+        # For every step in Hue
         for iHue in range(hsteps):
-            # the unit vector represented by L* and Hue (just the da*,db* terms)
+            # The unit vector represented by L* and Hue (just the da*,db* terms)
             Hmid = (Hue[iHue] + Hue[iHue + 1]) / 2
-            # define dir in shape=(2,1)
+            # Define dir in shape=(2,1)
             dir = np.array([[np.sin(Hmid)], [np.cos(Hmid)]])
 
             idet = 1.0 / np.dot(e2e1, dir)  # denominator for all calculations
@@ -162,15 +163,15 @@ def get_d_C(cgats: dict, Lsteps: int, hsteps: int) -> Tuple[list, list, np.ndarr
 def get_volume(filename: str) -> float:
     """Calculate the gamut volume."""
 
-    # read the CGATS file
+    # Read the CGATS file
     input_data = cgats.readCGATS(filename)
 
-    # calculate the d and C* values for the given L* and h* steps
+    # Calculate the d and C* values for the given L* and h* steps
     h_steps = 360
     L_steps = 100
     _, _, volmap = get_d_C(input_data, L_steps, h_steps)
 
-    # calculate the scaled sum for each L* and h* step
+    # Calculate the scaled sum for each L* and h* step
     # applying the scaling factor AFTER summing rather than before per-element
     # sum the values and correct the scaling
     V = np.sum(volmap) * 100 * np.pi / (L_steps * h_steps)
@@ -180,17 +181,21 @@ def get_volume(filename: str) -> float:
 def coverage(file: str, ref_file: str) -> Tuple[float, float]:
     """Calculate the intersection and coverage of gamut volume."""
 
+    # Read the CGATS files
     color_data = cgats.readCGATS(file)
     color_ref = cgats.readCGATS(ref_file)
 
+    # Calculate the volume maps for each color set and the intersection
     _, _, volmap = get_d_C(color_data, 100, 360)
     _, _, volmap_ref = get_d_C(color_ref, 100, 360)
     volmap_coverage = np.minimum(volmap, volmap_ref)
 
+    # Fix the scaling of the volume maps
     dH = 2 * np.pi / 360
     volmap_coverage = volmap_coverage * dH / 2
     volmap_ref = volmap_ref * dH / 2
 
+    # Calculate the volume of the intersection and the coverage ratio
     vol_coverage = np.sum(volmap_coverage)
     vol_ref = np.sum(volmap_ref)
     coverage_ratio = vol_coverage / vol_ref
