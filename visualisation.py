@@ -1,8 +1,9 @@
 """Take the RGB/3D color space coordinate data as input and visualize the gamut volume."""
 
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Tuple
 
 import cgats
 import get_volume
@@ -85,7 +86,9 @@ def calc_rings(volmap: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, 
     volmap = volmap * dL * dH / 2
     # Get the accumulated volume sum (the final row will be the total)
     # and calculate the radius required to represent that volume
-    rings = (2 * np.cumsum(volmap, axis=0) / dH) ** 0.5
+    term_before_sqrt = 2 * np.cumsum(volmap, axis=0) / dH
+    # Clamp negative values to 0 before taking the square root to avoid RuntimeWarning
+    rings = np.maximum(term_before_sqrt, 0) ** 0.5
 
     # Plot against the mid-point of the angle ranges
     midH = np.arange(dH / 2, 2 * np.pi, dH)

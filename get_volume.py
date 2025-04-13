@@ -2,8 +2,9 @@
 Take the RGB/3D color space coordinate data as input and return the gamut volume in delta E3.
 """
 
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 import cgats
 

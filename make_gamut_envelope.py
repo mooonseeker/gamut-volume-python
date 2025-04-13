@@ -3,7 +3,7 @@ Convert RGB/XYZ data to RGB/3D color space coordinate data.
 
 This module provides:
 - Generation of 3D color space coordinate data.
-- Supported model: 
+- Supported model:
     - CIELAB-D65/D50: RGB/LAB
     - CAM16-UCS: RGB/Jab
     - ICtCp: RGB/ICtCp
@@ -13,8 +13,8 @@ This module provides:
 Note: If higher accuracy is required, it is still recommended to use the chromatic adaptation fucntion from colour-science.
 """
 
-import numpy as np
 import colour
+import numpy as np
 
 import cgats
 

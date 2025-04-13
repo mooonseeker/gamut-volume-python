@@ -8,9 +8,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-    "numpy (>=2.2.2,<3.0.0)",
-    "colour-science (>=0.4.6,<0.5.0)",
-    "matplotlib (>=3.10.0,<4.0.0)"
+    "numpy",
+    "colour-science",
+    "matplotlib"
 ]
 
 [tool.poetry]
