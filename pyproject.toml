@@ -1,6 +1,6 @@
 [project]
 name = "gamut-volume-python"
-version = "1.0.0"
+version = "1.0.1"
 description = "Gamut volume calculation and visualisation in Python"
 authors = [
     {name = "mooonseeker",email = "zhushengtao1996@outlook.com"}

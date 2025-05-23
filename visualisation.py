@@ -1,15 +1,16 @@
 """Take the RGB/3D color space coordinate data as input and visualize the gamut volume."""
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 
 import cgats
 import get_volume
 
 
-def plot_rings(file: str, ref_file: str = None) -> list:
+def plot_rings(file: str, ref_file: Optional[str] = None) -> list:
     """Draw a gamut rings graph."""
 
     # Read the CGATS files
@@ -61,7 +62,8 @@ def plot_rings(file: str, ref_file: str = None) -> list:
         output = [vol]
 
     # Add a little padding to the axis range
-    plt.axis(np.array(plt.axis()) * 1.05)
+    xmin, xmax, ymin, ymax = plt.axis()
+    plt.axis((xmin * 1.05, xmax * 1.05, ymin * 1.05, ymax * 1.05))
 
     # Make the axis equal
     plt.axis("equal")
@@ -99,7 +101,7 @@ def calc_rings(volmap: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, 
     return x, y, rings, vol
 
 
-def plot_scatter(file: str, ref_file: str = None) -> None:
+def plot_scatter(file: str, ref_file: Optional[str] = None) -> None:
     """Draw a 3D color gamut volume graph."""
 
     # Create a 3D plot
@@ -123,10 +125,10 @@ def plot_scatter(file: str, ref_file: str = None) -> None:
     # Set the axis labels
     ax.set_xlabel(r"$a^{*}$")
     ax.set_ylabel(r"$b^{*}$")
-    ax.set_zlabel(r"$L^{*}$")
+    ax.set_zlabel(r"$L^{*}$")  # type: ignore
 
     # Set the axis limits
-    ax.set_xlim(ax.get_xlim()[::-1])
-    ax.view_init(elev=30, azim=30)
+    ax.set_xlim(ax.get_xlim()[::-1])  # type: ignore
+    ax.view_init(elev=30, azim=30)  # type: ignore
     plt.show()
     return None

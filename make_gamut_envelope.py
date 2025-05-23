@@ -13,6 +13,8 @@ This module provides:
 Note: If higher accuracy is required, it is still recommended to use the chromatic adaptation fucntion from colour-science.
 """
 
+from typing import Optional
+
 import colour
 import numpy as np
 
@@ -20,7 +22,7 @@ import cgats
 
 
 def make_gamut_envelope(
-    input_file: str, output_file: str = None, model: str = None
+    input_file: str, output_file: Optional[str] = None, model: str = "LAB-D50"
 ) -> dict:
     """Convert RGB/XYZ data to RGB/3D color space coordinate data."""
 

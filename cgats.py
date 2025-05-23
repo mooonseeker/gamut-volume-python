@@ -75,5 +75,5 @@ def writeCGATS(cgats: dict, filename: str) -> None:
         # Write out the set count then all of the data
         f.write(f"NUMBER_OF_SETS {data.shape[0]}\n")
         f.write("BEGIN_DATA\n")
-        np.savetxt(f, data, fmt="%g")
+        np.savetxt(f.name, data, fmt="%g")
         f.write("END_DATA\n")
